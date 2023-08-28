@@ -1,0 +1,35 @@
+{% extends "auctions/layout.html" %}
+{% load auction_tags %}
+
+{% block title %}WatchList{% endblock %}
+{% block body %}
+    <h1>WatchList</h1>
+     {% for i in page_obj %}
+
+        <div class="my-element">
+        <h2>{{i.product_name|wrap_text|linebreaks}}</h2>
+
+        {% if i.category %}
+            <h4>{{i.category}}</h4>
+            <br>
+        {% endif %}
+        {% if i.image_url %}
+        <div class="photo-container">
+            <img class="photo" src="{{ i.image_url.url }}" alt="Image">
+        </div>
+        <br>
+        {% endif %}
+
+        <a href="{% url 'auction_detail' i.slug %}">Read more</a>
+        <br><br>
+
+        <form method="post" action="{% url 'delete_watchlist' i.slug %}">
+        {% csrf_token %}
+        <button type="submit">Delete from watchlist</button>
+    </form>
+        </div>
+    <br><br>
+    {% empty %}
+        <h5>There are no auctions</h5>
+    {% endfor %}
+{% endblock %}

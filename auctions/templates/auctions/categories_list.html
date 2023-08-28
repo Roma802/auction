@@ -1,0 +1,29 @@
+{% extends "auctions/layout.html" %}
+{% load auction_tags %}
+
+{% block title %}Categories{% endblock %}
+{% block body %}
+    {% for i in auction_list %}
+        {% if i.is_active %}
+            <div class="my-element">
+            <h2>{{i.product_name|wrap_text|linebreaks}}</h2>
+                {% if i.category %}
+                    <h4> Category: {{i.category}}</h4>
+                    <br>
+                {% endif %}
+                {% if i.image_url %}
+                <div class="photo-container">
+                    <img class="photo" src="{{ i.image_url.url }}" alt="Image">
+                </div>
+                <br>
+                {% endif %}
+                <br>
+                <button class="button-blue"><a id="read-more" href="{% url 'auction_detail' i.slug %}">Read more</a></button>
+            </div>
+            <br><br>
+        {% endif %}
+    {% empty %}
+        <h5>There are no auctions in this category</h5>
+    {% endfor %}
+
+{% endblock %}

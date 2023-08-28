@@ -1,0 +1,83 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+{% load cache %}
+
+
+{% block title %}Auction{% endblock %}
+{% block body %}
+
+
+<script src="{% static 'auctions/timer.js' %}"></script>
+
+
+<h1>{{auction.product_name}}</h1>
+    <br>
+    {{auction.description}}
+    <br>
+    {% if auction.category %}
+        <h4>Category: {{auction.category}}</h4>
+        <br>
+    {% endif %}
+    {% if auction.image_url %}
+        <div class="photo-container">
+            <img class="photo" src="{{ auction.image_url.url }}" alt="Image">
+        </div>
+    {% endif %}
+
+
+    {% if error_message %}
+        <div class="alert alert-danger" role="alert">
+            {{ error_message }}
+        </div>
+    {% endif %}
+
+    {% if success_message %}
+        <div class="alert alert-success" role="alert">
+            {{success_message}}
+        </div>
+    {% else %}
+        {% if request.user == auction.author %}
+        <form method="post" action="{% url 'close_auction' auction.slug %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Close auction</button>
+        </form>
+        {% endif %}
+        {% if request.user.is_authenticated and request.user != auction.author %}
+            <form method="post" action="{% url 'make_bid' auction.slug %}">
+                <br>
+                {% csrf_token %}
+                {{bid_form.as_p}}
+                <button type="submit">Submit</button>
+            </form>
+        {% endif %}
+        <br>
+
+        {% if request.user.is_authenticated %}
+            <form method="post" action="{% url 'add_watchlist' auction.slug %}">
+                {% csrf_token %}
+                <button type="submit">Add to watchlist</button>
+            </form>
+        {% endif %}
+        <br>
+        <br>
+        {% if request.user.is_authenticated %}
+            <form method="post" action="{% url 'add_comment' auction.slug %}">
+                <h5>Comments:</h5>
+                {% csrf_token %}
+                {{ comment_form.as_p}}
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        {% endif %}
+        <br><br>
+
+        {% if comments %}
+            {% for i in comments %}
+                <img src="{% static 'auctions/user.png' %}" alt="User's image" class="resized-image"> {{i.commenter.username}}:{{i.text}}
+                <br>
+            {% endfor %}
+        {% endif %}
+    {% endif %}
+
+
+<div id="timer"></div>
+{% endblock %}
