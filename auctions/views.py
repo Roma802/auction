@@ -15,6 +15,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.text import slugify
+from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView
 import pickle
 
@@ -185,35 +186,36 @@ def close_auction(request, slug):
     # return redirect(redirect_url)
 
 
-min_value = 0
+# min_value = 0
 
 
+@require_POST
 @login_required
 def make_bid(request, slug):
-    if request.method == 'POST':
-        bid_form = BidForm(request.POST)
-        if bid_form.is_valid():
-            current_bid_amount = bid_form.cleaned_data['bid_amount']
-            auction = Auction.objects.select_related('author').get(slug=slug)
-            max_bid_amount = Bid.objects.filter(auction=auction).aggregate(Max('bid_amount'))  # максимальная сумма ставки для данного аукциона
-            context = {'bid_form': BidForm(initial={'bid_amount': current_bid_amount}),
-                       'comment_form': CommentForm(),
-                       'comments': Comment.objects.filter(auction=auction).select_related('commenter'),
-                       'auction': auction}
-            if max_bid_amount['bid_amount__max']: # если максимальная сумма ставки None то нам нужно избежать сравнения
-                if max_bid_amount['bid_amount__max'] >= current_bid_amount:
-                    context['error_message'] = 'The bid should be greater than last one.'
-                    return render(request, 'auctions/auctions_detail.html', context)
-            bid = bid_form.save(commit=False)
-            bid.bidder = request.user
-            bid.auction = auction
-            bid.save()
-            auction.bid = bid
-            auction.save()
-            return render(request, 'auctions/auctions_detail.html', context)
-    else:
-        redirect_url = reverse('auction_detail', kwargs={'slug': slug})
-        return redirect(redirect_url)
+    # if request.method == 'POST':
+    bid_form = BidForm(request.POST)
+    if bid_form.is_valid():
+        current_bid_amount = bid_form.cleaned_data['bid_amount']
+        auction = Auction.objects.select_related('author').get(slug=slug)
+        max_bid_amount = Bid.objects.filter(auction=auction).aggregate(Max('bid_amount'))  # максимальная сумма ставки для данного аукциона
+        context = {'bid_form': BidForm(initial={'bid_amount': current_bid_amount}),
+                   'comment_form': CommentForm(),
+                   'comments': Comment.objects.filter(auction=auction).select_related('commenter'),
+                   'auction': auction}
+        if max_bid_amount['bid_amount__max']: # если максимальная сумма ставки None то нам нужно избежать сравнения
+            if max_bid_amount['bid_amount__max'] >= current_bid_amount:
+                context['error_message'] = 'The bid should be greater than last one.'
+                return render(request, 'auctions/auctions_detail.html', context)
+        bid = bid_form.save(commit=False)
+        bid.bidder = request.user
+        bid.auction = auction
+        bid.save()
+        auction.bid = bid
+        auction.save()
+        return render(request, 'auctions/auctions_detail.html', context)
+    # else:
+    #     redirect_url = reverse('auction_detail', kwargs={'slug': slug})
+    #     return redirect(redirect_url)
 
 
 def get_paginator_and_page_and_auctions(request, watchlist):
@@ -225,14 +227,15 @@ def get_paginator_and_page_and_auctions(request, watchlist):
     return page_obj, paginator
 
 
+@require_POST
 @login_required
 def add_watchlist(request, slug):
     watchlist_pk = WatchListStorage.objects.filter(user=request.user).values_list('auction__pk', flat=True)
-    if request.method == 'POST':
-        auction = get_object_or_404(Auction, slug=slug)
-        if auction.pk not in watchlist_pk:
-            watchlist, created = WatchListStorage.objects.get_or_create(user=request.user)
-            watchlist.auction.add(auction)
+    # if request.method == 'POST':
+    auction = get_object_or_404(Auction, slug=slug)
+    if auction.pk not in watchlist_pk:
+        watchlist, created = WatchListStorage.objects.get_or_create(user=request.user)
+        watchlist.auction.add(auction)
     page_obj, paginator = get_paginator_and_page_and_auctions(request, watchlist_pk)
     return render(request, 'auctions/watchlist.html',
                       {'page_obj': page_obj, 'paginator': paginator})
@@ -245,14 +248,15 @@ def auction_watchlist(request):
     return render(request, 'auctions/watchlist.html', {'page_obj': page_obj, 'paginator': paginator})
 
 
+@require_POST
 @login_required
 def delete_watchlist(request, slug):
     watchlist_pk = WatchListStorage.objects.filter(user=request.user).values_list('auction__pk', flat=True)
-    if request.method == 'POST':
-        auction = get_object_or_404(Auction, slug=slug)
-        if auction.pk in watchlist_pk:
-            watchlist = get_object_or_404(WatchListStorage, user=request.user)
-            watchlist.auction.remove(auction)
+    # if request.method == 'POST':
+    auction = get_object_or_404(Auction, slug=slug)
+    if auction.pk in watchlist_pk:
+        watchlist = get_object_or_404(WatchListStorage, user=request.user)
+        watchlist.auction.remove(auction)
     page_obj, paginator = get_paginator_and_page_and_auctions(request, watchlist_pk)
     return render(request, 'auctions/watchlist.html', {'page_obj': page_obj, 'paginator': paginator})
 
