@@ -23,34 +23,6 @@ class Bid(models.Model):
     #     return f'{self.bidder} make bid on sum {self.bid_amount}'
 
 
-# @receiver(post_save, sender=Bid)
-# def delete_bid_without_auction(sender, instance, **kwargs):
-#     # new_instance = instance.split()[0]
-#     # print(f'new_instance - {new_instance}')
-#     # try:
-#     bids = Bid.objects.all()
-#     for i in bids:
-#         if not i.auction_set.all():
-#             # try:
-#             #     print('good')
-#             #     print(i)
-#             #     auction = Auction.objects.get(bid=i)
-#             #     print(f'auct - {auction}')
-#                 i.delete()
-#                 print(f'i - {i.bidder}')
-#             #     auction.bid = instance
-#             #     auction.save()
-#             # except Auction.DoesNotExist:
-#             #     print(' does not exist')
-#             # нужно назначить в обьект Auction поле bid - новый обьект Bid.
-#         else:
-#             print('bad')
-
-
-    # except IntegrityError as e:
-    #     # Обработка ошибки, если возникла IntegrityError при удалении объекта Bid
-    #     print(f'IntegrityError при удалении объекта: {e}')
-
 
 class Auction(models.Model):
     slug = models.SlugField(unique=True, blank=True, null=True)
