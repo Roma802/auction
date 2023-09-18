@@ -32,12 +32,8 @@ def save_winners_to_file(winners):
         pickle.dump(my_data, file)  # записываем
 
 
-# def get_paginator_and_page(request, ):
-#     auctions = Auction.objects.filter(Q(pk__in=watchlist) & Q(is_active=True)).order_by(
-#         'pk')  # возможно можно сделать все одной строкой
-#     paginator = Paginator(auctions, 3)
-#     page_number = request.GET.get('page')
-#     page_obj = paginator.get_page(page_number)
+
+
 
 
 
