@@ -156,8 +156,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 # EMAIL_USE_SSL = True
-EMAIL_HOST_USER = 'geleyroman941@gmail.com' # замените на свой адрес электронной почты
-EMAIL_HOST_PASSWORD = 'ioegblsfehwhfrbe' # замените на свой пароль
+EMAIL_HOST_USER = 'geleyroman941@gmail.com'
+EMAIL_HOST_PASSWORD = 'ioegblsfehwhfrbe'
 DEFAULT_FROM_EMAIL = 'geleylena@gmail.com'
 
 INTERNAL_IPS = [
